@@ -23,7 +23,7 @@ Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:\\Users\\Victor\\Desktop\\Cours\\
                         sep= .Platform$path.sep))
 library(rBLAST)
 
-### Création des bases de données avec nos transcriptomes femelle et male ###
+### Cr?ation des bases de donn?es avec nos transcriptomes femelle et male ###
 
 makeblastdb(file="Donnees/Transcriptomes/highest_iso_GFBF_GHCZ01.1.fsa_nt", dbtype = "nucl", args = c("-out GfossB_f -title GfossB_f -parse_seqids"))
 makeblastdb(file="Donnees/Transcriptomes/highest_iso_GFBM_GHDA01.1.fsa_nt", dbtype = "nucl", args=c("-out GfossB_m -title GfossB_m -parse_seqids"))
@@ -59,7 +59,7 @@ cyp314_blast_m <- predict(blast_m, cyp314)
 cyp315_blast_m <- predict(blast_m, cyp315)
 
 
-### Top 1 résultats Blast femelle ###
+### Top 1 rï¿½sultats Blast femelle ###
 
 top_cyp302_blast_f <- cyp302_blast_f[1,]
 top_cyp306_blast_f <- cyp306_blast_f[1,]
@@ -68,7 +68,7 @@ top_cyp314_blast_f <- cyp314_blast_f[1,]
 top_cyp315_blast_f <- cyp315_blast_f[1,]
 
 
-### Top 1 résultats Blast male ###
+### Top 1 r?sultats Blast male ###
 
 top_cyp302_blast_m <- cyp302_blast_m[1,]
 top_cyp306_blast_m <- cyp306_blast_m[1,]
@@ -77,7 +77,7 @@ top_cyp314_blast_m <- cyp314_blast_m[1,]
 top_cyp315_blast_m <- cyp315_blast_m[1,]
 
 
-### Assignation du fasta à partir de l'id du transcriptome ###
+### Assignation du fasta ? partir de l'id du transcriptome ###
 
 ### pour la femelle ###
 
@@ -151,7 +151,7 @@ orf_dna_cyp315_m <-find_orfs(fasta_cyp315_blast_m,reverse.strand = TRUE )
 orf_Forward_aa_cyp315_m <- paste(translate(s2c(orf_dna_cyp315_m$ORF.Forward$ORF.Max.Seq)), collapse = "")
 orf_Reverse_aa_cyp315_m <- paste(translate(s2c(orf_dna_cyp315_m$ORF.Reverse$ORF.Max.Seq)), collapse = "")
 
-### Ecriture des résultats dans le dossier R_Orf ###
+### Ecriture des r?sultats dans le dossier R_Orf ###
 
 ### pour la femelle
 ### Forward strand
@@ -210,14 +210,20 @@ write.fasta(orf_Reverse_aa_cyp315_m, names = top_cyp315_blast_m$SubjectID,
             file.out = "R_Orf/orf_Reverse_cyp315_m.fasta", open = "w")
 
 
-### Alignement multiple pour la phylogénie ###
+### Alignement multiple pour la phylog?nie ###
 
 #if (!requireNamespace("BiocManager", quietly=TRUE))
 #  install.packages("BiocManager")
 #BiocManager::install("msa")
 library(msa)
 
-msaClustalW("filefasta", type = "protein/dna/rna")
+msaClustalW(inputSeqs ="Phylogeny/Arthropod phylogeny.fasta", type = "protein")
+
+
+### Phylogï¿½nie ###
+
+#install.packages("phylogram")
+library(phylogram)
 
 
 
