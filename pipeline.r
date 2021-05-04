@@ -133,11 +133,11 @@ for ( i in 1:length(list_cyp) ){
 library(msa)
 library(ape)
 
-alignement1 <- readAAStringSet("Phylogeny/Arthropod_phylogeny.fasta")
-alignement2 <- readAAStringSet("R_Orf/orf_forward_cyp302_f.fasta")
-alignement_multiple <- paste(alignement1, alignement2)
+## Lire dux fichier fasta pour mettre notre ORF a la fin du fichier d'alignement
 
-multiple_alignement <- msaMuscle(alignement_multiple, type = "protein")
+alignement <- readAAStringSet(c("Phylogeny/Arthropod_phylogeny.fasta", "R_Orf/orf_forward_cyp302_f.fasta"))
+
+multiple_alignement <- msaClustalW(alignement, type = "protein")
 
 ## Si on veut garder l'alignement multiple : 
 #write.phylip(multiple_alignement, "Phylogeny/Multiple_alignement.txt")
@@ -148,13 +148,11 @@ multiple_alignement <- msaMuscle(alignement_multiple, type = "protein")
 
 ### Phylogénie ###
 
-multiple_alignement <- msaConvert(multiple_alignement,type = "seqinr::alignment")
+multiple_alignement <- msaConvert(multiple_alignement)
 d <- dist.alignment(multiple_alignement, "identity")
 tree <- nj(d)
 tree <- makeLabel(tree, space = "")
 plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = FALSE, font = 2 )
-
-
 
 
 
