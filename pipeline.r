@@ -161,39 +161,3 @@ tree <- nj(d)
 tree <- makeLabel(tree, space = "")
 plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = FALSE, font = 2 )
 
-
-
-### Récupérer les 10 top blast Hits du cyp306 puis rechercher les ORFs  
-
-top_cyp306_blast_f <- cyp306_blast_f[1:10,]
-top_cyp306_blast_m <- cyp306_blast_m[1:10,]
-fasta_cyp306_blast_f <- transcriptome_f[top_cyp306_blast_f$SubjectID]
-fasta_cyp306_blast_m <- transcriptome_m[top_cyp306_blast_m$SubjectID]
-
-
-
-
-for ( i in 1:10 ) { 
-
-  orf_dna_cyp306_f[[i]] <- find_orfs(fasta_cyp306_blast_f[[i]], reverse.strand = TRUE)
-  orf_Forward_aa_cyp306_f[[i]] <-  paste(translate(s2c(orf_dna_cyp306_f[[i]]$ORF.Forward$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Forward_aa_cyp306_f[[i]], names = top_cyp306_blast_f[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_forward_cyp306_f", i,".fasta", sep=""), open = "w")
-  orf_Reverse_aa_cyp306_f[[i]] <-  paste(translate(s2c(orf_dna_cyp306_f[[i]]$ORF.Reverse$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Reverse_aa_cyp306_f[[i]], names = top_cyp306_blast_f[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_Reverse_cyp306_f", i,".fasta", sep=""), open = "w")
-}
-
-
-for ( i in 1:10 ) { 
-  
-  orf_dna_cyp306_m[[i]] <- find_orfs(fasta_cyp306_blast_m[[i]], reverse.strand = TRUE)
-  orf_Forward_aa_cyp306_m[[i]] <-  paste(translate(s2c(orf_dna_cyp306_m[[i]]$ORF.Forward$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Forward_aa_cyp306_m[[i]], names = top_cyp306_blast_m[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_forward_cyp306_m", i,".fasta", sep=""), open = "w")
-  orf_Reverse_aa_cyp306_m[[i]] <-  paste(translate(s2c(orf_dna_cyp306_m[[i]]$ORF.Reverse$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Reverse_aa_cyp306_m[[i]], names = top_cyp306_blast_m[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_Reverse_cyp306_m", i,".fasta", sep=""), open = "w")
-}
-
-
