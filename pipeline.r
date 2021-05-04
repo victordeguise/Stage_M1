@@ -110,10 +110,13 @@ library(LncFinder)
 list_cyp <- c("CYP18", "CYP302", "CYP306", "CYP307", "CYP314", "CYP315")
 orf_dna_f <- vector(mode="list", length=6)
 orf_dna_m <- vector(mode="list", length=6)
-orf_Forward_aa_cyp_f = list()
-orf_Forward_aa_cyp_m = list()
+orf_Forward_aa_cyp_f = vector(mode="list", length=6)
+orf_Forward_aa_cyp_m = vector(mode="list", length=6)
 names(orf_dna_f) <- c("CYP18", "CYP302", "CYP306", "CYP307", "CYP314", "CYP315")
 names(orf_dna_m) <- c("CYP18", "CYP302", "CYP306", "CYP307", "CYP314", "CYP315")
+names(orf_Forward_aa_cyp_f) <- c("CYP18", "CYP302", "CYP306", "CYP307", "CYP314", "CYP315")
+names(orf_Forward_aa_cyp_m) <- c("CYP18", "CYP302", "CYP306", "CYP307", "CYP314", "CYP315")
+
 
 for ( i in 1:length(list_cyp) ){
   
@@ -130,7 +133,7 @@ for ( i in 1:length(list_cyp) ){
 
 
 
-### Alignement multiple pour la phylog?nie ###
+### Alignement multiple pour la phylogénie ###
 
 #if (!requireNamespace("BiocManager", quietly=TRUE))
 #  install.packages("BiocManager")
@@ -150,7 +153,19 @@ multiple_alignement <- msaClustalW(alignement, type = "protein")
 ## Si on veut garder l'alignement multiple : 
 #write.phylip(multiple_alignement, "Phylogeny/Multiple_alignement.txt")
 
-#msaPrettyPrint(multiple_alignement, output = "pdf")
+
+## Pour visualiser l'alignement il faut d'abord installer miktex
+# https://miktex.org/download
+## Puis il faut ajouter la variable d'environnement
+Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:/Users/Victor/AppData/Local/Programs/MiKTeX/miktex/bin/x64",
+                        sep= .Platform$path.sep))
+# Installer le package "tools" pour mettre le .tex en pdf
+#install.packages("tools")
+library(tools)
+msaPrettyPrint(multiple_alignement, output = "tex")
+texi2pdf("multiple_alignement.tex", clean=TRUE)
+
+
 
 
 ### Phylogénie ###
