@@ -18,24 +18,16 @@ dir= "C:/Users/Victor/Desktop/Cours/Master/S2/Stage/Projet/"
 #Install rBlast from GitHub using devtools::install_github("mhahsler/rBLAST").
 
 
-<<<<<<< HEAD
-## Pour avoir acc?s a la commande makeblastdb et blast, il faut situer l'emplacement du dossier qui contient l'executable
-## A t?l?charger ici : https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ (en fonction du syst?me d'exploitation)
-=======
 ## Pour avoir accès a la commande makeblastdb et blast, il faut situer l'emplacement du dossier qui contient l'executable
 ## A télécharger ici : https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ (en fonction du système d'exploitation)
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
 
 Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:\\Users\\Victor\\Desktop\\Cours\\Master\\S2\\Stage\\Projet\\ncbi-blast-2.11.0+\\bin",
                         sep= .Platform$path.sep))
 
 library(rBLAST)
 
-<<<<<<< HEAD
-### Cr?ation des bases de donn?es avec nos transcriptomes femelle et male ###
-=======
+
 ### Création des bases de données avec nos transcriptomes femelle et male ###
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
 
 makeblastdb(file="Donnees/Transcriptomes/highest_iso_GFBF_GHCZ01.1.fsa_nt", dbtype = "nucl", args = c("-out GfossB_f -title GfossB_f -parse_seqids"))
 makeblastdb(file="Donnees/Transcriptomes/highest_iso_GFBM_GHDA01.1.fsa_nt", dbtype = "nucl", args=c("-out GfossB_m -title GfossB_m -parse_seqids"))
@@ -72,11 +64,7 @@ for ( i in 1:length(list_cyp_Hya) ){
   
 }
 
-<<<<<<< HEAD
-### Top 1 r?sultats Blast femelle/male ###
-=======
 ### Top 1 résultats Blast femelle/male ###
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
 
 top_cyp_blast_f <- vector(mode="list", length=6)
 top_cyp_blast_m <- vector(mode="list", length=6)
@@ -90,11 +78,9 @@ for ( i in 1:length(list_cyp_Hya) ){
   
 }
 
-<<<<<<< HEAD
-### Assignation du fasta ? partir de l'id du transcriptome ###
-=======
+
 ### Assignation du fasta à partir de l'id du transcriptome ###
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
+
 
 library(seqinr)
 # install.packages(seqinr)
@@ -115,11 +101,8 @@ for ( i in 1:length(list_cyp_Hya) ){
 }
 
 
-<<<<<<< HEAD
-### Recherche d'ORFs chez le male et la femelle et ?criture dans un r?pertoire ###
-=======
+
 ### Recherche d'ORFs chez le male et la femelle et écriture dans un répertoire ###
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
 
 #install.packages("LncFinder")
 library(LncFinder)
@@ -138,11 +121,7 @@ for ( i in 1:length(list_cyp) ){
   orf_dna_m[[i]] <- find_orfs(fasta_cyp_blast_m[[i]],reverse.strand = FALSE)
   orf_Forward_aa_cyp_f[[i]] <- paste(translate(s2c(orf_dna_f[[i]]$ORF.Max.Seq)), collapse = "")
   orf_Forward_aa_cyp_m[[i]] <- paste(translate(s2c(orf_dna_m[[i]]$ORF.Max.Seq)), collapse = "")
-<<<<<<< HEAD
-  # Ecriture des r?sultats dans le dossier R_Orf/
-=======
   # Ecriture des résultats dans le dossier R_Orf/
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
   write.fasta(orf_Forward_aa_cyp_f[[i]], names = top_cyp_blast_f[[i]]$SubjectID, 
               file.out = paste("R_Orf/orf_Forward_",list_cyp[i],"_f.fasta", sep=""), open = "w")
   write.fasta(orf_Forward_aa_cyp_m[[i]], names = top_cyp_blast_m[[i]]$SubjectID, 
@@ -150,7 +129,7 @@ for ( i in 1:length(list_cyp) ){
 }
 
 
-<<<<<<< HEAD
+
 ### Alignement multiple pour la phylog?nie ###
 
 #if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -174,7 +153,6 @@ multiple_alignement <- msaClustalW(alignement, type = "protein")
 #msaPrettyPrint(multiple_alignement, output = "pdf")
 
 
-
 ### Phylogénie ###
 
 multiple_alignement <- msaConvert(multiple_alignement)
@@ -182,72 +160,6 @@ d <- dist.alignment(multiple_alignement, "identity")
 tree <- nj(d)
 tree <- makeLabel(tree, space = "")
 plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = FALSE, font = 2 )
-
-
-
-
-### R?cup?rer les 10 top blast Hits du cyp306 puis rechercher les ORFs  
-
-top_cyp306_blast_f <- cyp306_blast_f[1:10,]
-top_cyp306_blast_m <- cyp306_blast_m[1:10,]
-fasta_cyp306_blast_f <- transcriptome_f[top_cyp306_blast_f$SubjectID]
-fasta_cyp306_blast_m <- transcriptome_m[top_cyp306_blast_m$SubjectID]
-
-
-
-
-for ( i in 1:10 ) { 
-
-  orf_dna_cyp306_f[[i]] <- find_orfs(fasta_cyp306_blast_f[[i]], reverse.strand = TRUE)
-  orf_Forward_aa_cyp306_f[[i]] <-  paste(translate(s2c(orf_dna_cyp306_f[[i]]$ORF.Forward$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Forward_aa_cyp306_f[[i]], names = top_cyp306_blast_f[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_forward_cyp306_f", i,".fasta", sep=""), open = "w")
-  orf_Reverse_aa_cyp306_f[[i]] <-  paste(translate(s2c(orf_dna_cyp306_f[[i]]$ORF.Reverse$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Reverse_aa_cyp306_f[[i]], names = top_cyp306_blast_f[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_Reverse_cyp306_f", i,".fasta", sep=""), open = "w")
-}
-
-
-for ( i in 1:10 ) { 
-  
-  orf_dna_cyp306_m[[i]] <- find_orfs(fasta_cyp306_blast_m[[i]], reverse.strand = TRUE)
-  orf_Forward_aa_cyp306_m[[i]] <-  paste(translate(s2c(orf_dna_cyp306_m[[i]]$ORF.Forward$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Forward_aa_cyp306_m[[i]], names = top_cyp306_blast_m[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_forward_cyp306_m", i,".fasta", sep=""), open = "w")
-  orf_Reverse_aa_cyp306_m[[i]] <-  paste(translate(s2c(orf_dna_cyp306_m[[i]]$ORF.Reverse$ORF.Max.Seq)), collapse = "")
-  write.fasta(orf_Reverse_aa_cyp306_m[[i]], names = top_cyp306_blast_m[i,]$SubjectID, 
-              file.out = paste("R_Orf/orf_Reverse_cyp306_m", i,".fasta", sep=""), open = "w")
-}
-=======
-### Alignement multiple pour la phylogénie ###
-
-#if (!requireNamespace("BiocManager", quietly=TRUE))
-#  install.packages("BiocManager")
-#BiocManager::install("msa")
-library(msa)
-library(ape)
-
-## Lire dux fichier fasta pour mettre notre ORF a la fin du fichier d'alignement
-
-alignement <- readAAStringSet(c("Phylogeny/Arthropod_phylogeny.fasta", "R_Orf/orf_forward_cyp302_f.fasta"))
-
-multiple_alignement <- msaClustalW(alignement, type = "protein")
-
-## Si on veut garder l'alignement multiple : 
-#write.phylip(multiple_alignement, "Phylogeny/Multiple_alignement.txt")
-
-#msaPrettyPrint(multiple_alignement, output = "pdf")
-
-
-
-### Phylogénie ###
-
-multiple_alignement <- msaConvert(multiple_alignement)
-d <- dist.alignment(multiple_alignement, "identity")
-tree <- nj(d)
-tree <- makeLabel(tree, space = "")
-plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = FALSE, font = 2 )
-
 
 
 
@@ -257,15 +169,11 @@ top_cyp306_blast_f <- cyp306_blast_f[1:10,]
 top_cyp306_blast_m <- cyp306_blast_m[1:10,]
 fasta_cyp306_blast_f <- transcriptome_f[top_cyp306_blast_f$SubjectID]
 fasta_cyp306_blast_m <- transcriptome_m[top_cyp306_blast_m$SubjectID]
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
 
 
 
 
-<<<<<<< HEAD
-=======
 for ( i in 1:10 ) { 
->>>>>>> a366f163f5e138ab8011a5431eb032a91f4240fa
 
   orf_dna_cyp306_f[[i]] <- find_orfs(fasta_cyp306_blast_f[[i]], reverse.strand = TRUE)
   orf_Forward_aa_cyp306_f[[i]] <-  paste(translate(s2c(orf_dna_cyp306_f[[i]]$ORF.Forward$ORF.Max.Seq)), collapse = "")
@@ -287,4 +195,5 @@ for ( i in 1:10 ) {
   write.fasta(orf_Reverse_aa_cyp306_m[[i]], names = top_cyp306_blast_m[i,]$SubjectID, 
               file.out = paste("R_Orf/orf_Reverse_cyp306_m", i,".fasta", sep=""), open = "w")
 }
+
 
