@@ -183,9 +183,9 @@ for ( i in 1:length(list_cyp) ){
   orf_Forward_aa_cyp_m[[i]] <- paste(translate(s2c(orf_dna_m[[i]]$ORF.Max.Seq)), collapse = "")
   # Ecriture des résultats dans le dossier R_Orf/
   write.fasta(orf_Forward_aa_cyp_f[[i]], names = top_cyp_blast_f[[i]]$SubjectID, 
-              file.out = paste(ORFdir,"orf_Forward_",list_cyp[i],"_f.fasta", sep=""), open = "w")
+              file.out = file.path(ORFdir, paste("orf_Forward_",list_cyp[i],"_f.fasta", sep="")), open = "w")
   write.fasta(orf_Forward_aa_cyp_m[[i]], names = top_cyp_blast_m[[i]]$SubjectID, 
-              file.out = paste(ORFdir, "orf_Forward_",list_cyp[i],"_m.fasta", sep=""), open = "w")
+              file.out = file.path(ORFdir, paste("orf_Forward_",list_cyp[i],"_m.fasta", sep="")), open = "w")
 }
 
 
@@ -232,8 +232,7 @@ plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = 
 
 # other attached packages:
 # ape_5.5             msa_1.22.0          LncFinder_1.1.4     seqinr_4.2-5        rBLAST_0.99.2      
-# stringr_1.4.0       Biostrings_2.58.0   XVector_0.30.0      IRanges_2.24.1      S4Vectors_0.28.1   
-# BiocGenerics_0.36.1
+# Biostrings_2.58.0   XVector_0.30.0      IRanges_2.24.1      S4Vectors_0.28.1    BiocGenerics_0.36.1
 
 # loaded via a namespace (and not attached):
 # pkgload_1.2.1        splines_4.0.3        foreach_1.5.1        prodlim_2019.11.13   assertthat_0.2.1    
@@ -246,10 +245,10 @@ plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = 
 # withr_2.4.2          nnet_7.3-15          cli_2.5.0            survival_3.2-11      magrittr_2.0.1      
 # crayon_1.4.1         memoise_2.0.0        ps_1.6.0             fs_1.5.0             fansi_0.4.2         
 # nlme_3.1-152         MASS_7.3-53.1        class_7.3-18         pkgbuild_1.2.0       data.table_1.14.0   
-# prettyunits_1.1.1    hms_1.0.0            lifecycle_1.0.0      munsell_0.5.0        callr_3.7.0         
-# e1071_1.7-6          ade4_1.7-16          compiler_4.0.3       rlang_0.4.10         grid_4.0.3          
-# iterators_1.0.13     rstudioapi_0.13      testthat_3.0.2       ModelMetrics_1.2.2.2 gtable_0.3.0        
-# codetools_0.2-18     DBI_1.1.1            curl_4.3             reshape2_1.4.4       R6_2.5.0            
-# lubridate_1.7.10     dplyr_1.0.5          fastmap_1.1.0        utf8_1.2.1           rprojroot_2.0.2     
-# desc_1.3.0           stringi_1.5.3        Rcpp_1.0.6           vctrs_0.3.8          rpart_4.1-15        
-# tidyselect_1.1.1 
+# prettyunits_1.1.1    hms_1.0.0            lifecycle_1.0.0      stringr_1.4.0        munsell_0.5.0       
+# callr_3.7.0          e1071_1.7-6          ade4_1.7-16          compiler_4.0.3       rlang_0.4.10        
+# grid_4.0.3           iterators_1.0.13     rstudioapi_0.13      testthat_3.0.2       ModelMetrics_1.2.2.2
+# gtable_0.3.0         codetools_0.2-18     DBI_1.1.1            curl_4.3             reshape2_1.4.4      
+# R6_2.5.0             lubridate_1.7.10     dplyr_1.0.5          fastmap_1.1.0        utf8_1.2.1          
+# rprojroot_2.0.2      desc_1.3.0           stringi_1.5.3        Rcpp_1.0.6           vctrs_0.3.8         
+# rpart_4.1-15         tidyselect_1.1.1   
