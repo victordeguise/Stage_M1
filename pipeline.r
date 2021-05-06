@@ -40,9 +40,9 @@
 list.of.packages <- c("BiocManager", "devtools", "seqinr", "LncFinder", "ape", "tools") #list of packages required
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])] #list of packages non installed
 if(length(new.packages)) install.packages(new.packages, repos='https://cran.rstudio.com/') #install packages if the new.packages list is not empty
-devtools::install_bioc("Biostrings")
-devtools::install_github("mhahsler/rBLAST")
-BiocManager::install("msa")
+#devtools::install_bioc("Biostrings")
+#devtools::install_github("mhahsler/rBLAST")
+#BiocManager::install("msa")
 
 #tools
 library(rBLAST)
@@ -183,9 +183,9 @@ for ( i in 1:length(list_cyp) ){
   orf_Forward_aa_cyp_m[[i]] <- paste(translate(s2c(orf_dna_m[[i]]$ORF.Max.Seq)), collapse = "")
   # Ecriture des résultats dans le dossier R_Orf/
   write.fasta(orf_Forward_aa_cyp_f[[i]], names = top_cyp_blast_f[[i]]$SubjectID, 
-              file.out = file.path(ORFdir, paste("orf_Forward_",list_cyp[i],"_f.fasta", sep="")), open = "w")
+              file.out = file.path(ORFdir, paste("orf_forward_",list_cyp[i],"_f.fasta", sep="")), open = "w")
   write.fasta(orf_Forward_aa_cyp_m[[i]], names = top_cyp_blast_m[[i]]$SubjectID, 
-              file.out = file.path(ORFdir, paste("orf_Forward_",list_cyp[i],"_m.fasta", sep="")), open = "w")
+              file.out = file.path(ORFdir, paste("orf_forward_",list_cyp[i],"_m.fasta", sep="")), open = "w")
 }
 
 
