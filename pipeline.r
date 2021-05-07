@@ -27,8 +27,7 @@
 # 05.  SÉLECTION TOP 1 RÉSULTATS BLAST FEMELLE/MALE
 # 06.  ASSIGNATION DU FASTA À PARTIR DE L'ID DU TRANSCRIPTOME
 # 07.  RECHERCHE D'ORFS ET ÉCRITURE DES FASTA
-# 08.  ALIGNEMENT MULTIPLE POUR LA PHYLOGÉNIE
-# 09.  PHYLOGÉNIE
+# 08.  ALIGNEMENT MULTIPLE ET PHYLOGÉNIE
 
 #      APPENDICES
 
@@ -37,7 +36,7 @@
 #-------------------------------------------------------------------
 ## Required packages
 # Installs missing libraries !
-list.of.packages <- c("BiocManager", "devtools", "seqinr", "LncFinder", "ape", "tools") #list of packages required
+list.of.packages <- c("BiocManager", "devtools", "seqinr", "LncFinder", "ape", "tools", "ggtree") #list of packages required
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])] #list of packages non installed
 if(length(new.packages)) install.packages(new.packages, repos='https://cran.rstudio.com/') #install packages if the new.packages list is not empty
 #devtools::install_bioc("Biostrings")
@@ -51,6 +50,7 @@ library(LncFinder)
 library(msa)
 library(ape)
 library(tools)
+library(ggtree)
 
 #set environment
 ## Pour avoir accès a la commande makeblastdb et blast, il faut situer l'emplacement du dossier qui contient l'executable
@@ -76,6 +76,8 @@ Genes_dir <- file.path(wdir, "Genes_Biosynthesis/")
 
 ## Output directory
 ORFdir <- file.path(wdir, "R_Orf/")
+PhylogenyDir <- file.path(wdir, "Phylogeny/")
+Multiple_align_Dir <- file.path(wdir, "Multiple_Alignement/")
 
 
 
@@ -183,35 +185,32 @@ for ( i in 1:length(list_cyp) ){
   orf_Forward_aa_cyp_m[[i]] <- paste(translate(s2c(orf_dna_m[[i]]$ORF.Max.Seq)), collapse = "")
   # Ecriture des résultats dans le dossier R_Orf/
   write.fasta(orf_Forward_aa_cyp_f[[i]], names = top_cyp_blast_f[[i]]$SubjectID, 
-              file.out = file.path(ORFdir, paste("orf_forward_",list_cyp[i],"_f.fasta", sep="")), open = "w")
+              file.out = file.path(ORFdir, paste("orf_",list_cyp[i],"_f.fasta", sep="")), open = "w")
   write.fasta(orf_Forward_aa_cyp_m[[i]], names = top_cyp_blast_m[[i]]$SubjectID, 
-              file.out = file.path(ORFdir, paste("orf_forward_",list_cyp[i],"_m.fasta", sep="")), open = "w")
+              file.out = file.path(ORFdir, paste("orf_",list_cyp[i],"_m.fasta", sep="")), open = "w")
 }
 
 
 #-------------------------------------------------------------------
-# 08. ALIGNEMENT MULTIPLE POUR LA PHYLOGÉNIE 
+# 08. ALIGNEMENT MULTIPLE ET PHYLOGÉNIE 
 #-------------------------------------------------------------------
 
-alignement <- readAAStringSet(c("Phylogeny/Arthropod_phylogeny.fasta","R_Orf/orf_forward_cyp18_f.fasta" ,
-                                "R_Orf/orf_forward_cyp302_f.fasta","R_Orf/orf_forward_cyp306_f.fasta", 
-                                "R_Orf/orf_forward_cyp306_m.fasta", "R_Orf/orf_forward_cyp307_f.fasta", 
-                                "R_Orf/orf_forward_cyp314_f.fasta", "R_Orf/orf_forward_cyp315_f.fasta"))
+list_orf <- list.files("R_Orf/")
+list_cyp_phylo <- c("CYP18_F_", "CYP18_M_","CYP302_F_","CYP302_M_", "CYP306_F_", "CYP306_M_","CYP307_F_", 
+                    "CYP307_M_","CYP314_F_", "CYP314_M_","CYP315_F_","CYP315_M_")
 
-multiple_alignement <- msaClustalW(alignement, type = "protein")
-msaPrettyPrint(multiple_alignement, output = "tex")
-texi2pdf(file.path(wdir, "multiple_alignement.tex"), clean=TRUE)
-
-#-------------------------------------------------------------------
-# 09. PHYLOGÉNIE
-#-------------------------------------------------------------------
-
-multiple_alignement <- msaConvert(multiple_alignement)
-d <- dist.alignment(multiple_alignement, "identity")
-tree <- nj(d)
-tree <- makeLabel(tree, space = "")
-plot.phylo(tree,type = "phylogram", main="Phylogenetic Tree", use.edge.length = FALSE, font = 2 )
-
+for ( i in 1:length(list_orf)) {
+  alignement <- read.fasta(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path(ORFdir, list_orf[i])))
+  multiple_alignement <- msaMuscle(alignement, type = "protein")
+  #msaPrettyPrint(multiple_alignement, file = file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep = "")) , output = "tex")
+  #texi2pdf(file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep="")), clean = TRUE)
+  multiple_alignement <- msaConvert(multiple_alignement)
+  d <- dist.alignment(multiple_alignement, "identity")
+  tree <- nj(d)
+  ggtree(tree, branch.length = "none") + geom_tiplab() + xlim(0, 20) + geom_treescale()
+  ggsave(file.path(PhylogenyDir, paste("phylo_tree_", list_cyp_phylo[i],"Rstudio.pdf", sep = "")), 
+         device = "pdf",height = 60, width = 35, units = "cm", limitsize = FALSE)
+}
 
 
 #-------------------------------------------------------------------
