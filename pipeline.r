@@ -200,7 +200,7 @@ list_cyp_phylo <- c("CYP18_F_", "CYP18_M_","CYP302_F_","CYP302_M_", "CYP306_F_",
                     "CYP307_M_","CYP314_F_", "CYP314_M_","CYP315_F_","CYP315_M_")
 
 for ( i in 1:length(list_orf)) {
-  alignement <- read.fasta(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path(ORFdir, list_orf[i])))
+  alignement <- readAAStringSet(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path(ORFdir, list_orf[i])))
   multiple_alignement <- msaMuscle(alignement, type = "protein")
   #msaPrettyPrint(multiple_alignement, file = file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep = "")) , output = "tex")
   #texi2pdf(file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep="")), clean = TRUE)
