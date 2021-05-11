@@ -52,6 +52,7 @@ library(ape)
 library(tools)
 library(ggtree)
 
+
 #set environment
 ## Pour avoir accès a la commande makeblastdb et blast, il faut situer l'emplacement du dossier qui contient l'executable
 ## A télécharger ici : https://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ (en fonction du système d'exploitation)
@@ -199,15 +200,23 @@ list_orf <- list.files("R_Orf/")
 list_cyp_phylo <- c("CYP18_F_", "CYP18_M_","CYP302_F_","CYP302_M_", "CYP306_F_", "CYP306_M_","CYP307_F_", 
                     "CYP307_M_","CYP314_F_", "CYP314_M_","CYP315_F_","CYP315_M_")
 
+top_cyp_blast = rbind(top_cyp_blast_f$CYP18$SubjectID,top_cyp_blast_m$CYP18$SubjectID,top_cyp_blast_f$CYP302$SubjectID,
+                      top_cyp_blast_m$CYP302$SubjectID,top_cyp_blast_f$CYP306$SubjectID,top_cyp_blast_m$CYP306$SubjectID,
+                      top_cyp_blast_f$CYP307$SubjectID,top_cyp_blast_m$CYP307$SubjectID,top_cyp_blast_f$CYP314$SubjectID,
+                      top_cyp_blast_m$CYP314$SubjectID,top_cyp_blast_f$CYP315$SubjectID,top_cyp_blast_m$CYP315$SubjectID)
+
+
 for ( i in 1:length(list_orf)) {
-  alignement <- readAAStringSet(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path(ORFdir, list_orf[i])))
-  multiple_alignement <- msaMuscle(alignement, type = "protein")
+  sequence <- readAAStringSet(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path(ORFdir, list_orf[i])) )
+  multiple_alignement <- msa(sequence, method = "Muscle", type = "protein")
   #msaPrettyPrint(multiple_alignement, file = file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep = "")) , output = "tex")
   #texi2pdf(file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep="")), clean = TRUE)
-  multiple_alignement <- msaConvert(multiple_alignement)
-  d <- dist.alignment(multiple_alignement, "identity")
-  tree <- nj(d)
-  ggtree(tree, branch.length = "none") + geom_tiplab() + xlim(0, 20) + geom_treescale()
+  alignement <- msaConvert(multiple_alignement)
+  d <-  as.matrix(dist.alignment(alignement, matrix = "identity" ))
+  tree <- bionj(d)
+  df <- data.frame(taxa = top_cyp_blast[i],orf = "orf")
+  row.names(df) <- NULL
+  ggtree(tree) %<+% df + geom_tiplab(aes(color=orf), font=2) + xlim(0,1) + geom_treescale() + theme(legend.position = "none")
   ggsave(file.path(PhylogenyDir, paste("phylo_tree_", list_cyp_phylo[i],"Rstudio.pdf", sep = "")), 
          device = "pdf",height = 60, width = 35, units = "cm", limitsize = FALSE)
 }
