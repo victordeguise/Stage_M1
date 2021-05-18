@@ -49,7 +49,6 @@ for i in $(ls $FASTQ_DIR); do
 	#rm ${i} # suppression du Fastq compressé, sauf si on veut garder le fichier ?
 done
 
-# Abundance estimation 
 
 ### CHOIX DES INPUTS ###
 
@@ -57,8 +56,7 @@ my_transcript=$ASSEMBLIES_DIR/GPulex-f_GHCP01.1.fsa_nt
 R1=$FASTQ_DIR/C4F_R1.fastq
 R2=$FASTQ_DIR/C4F_R2.fastq
 
-#mkdir -p $MYDIR/rsem_outdir/Male
-#mkdir -p $MYDIR/rsem_outdir/Femelle
+# Abundance estimation 
 
 $TRINITY/align_and_estimate_abundance.pl \
 --transcripts ${my_transcript} --seqType fq \
