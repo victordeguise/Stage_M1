@@ -22,7 +22,6 @@ fi
 
 
 # Rename Headers for all assemblies fasta
-# Enlever le "#" devant sed si besoin de renommer les Headers. 
 
 while true; do
 	read -p "Do you want to rename headers for assemblies fasta ?" yn
