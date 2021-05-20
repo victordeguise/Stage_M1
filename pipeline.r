@@ -36,7 +36,7 @@
 #-------------------------------------------------------------------
 ## Required packages
 # Installs missing libraries !
-list.of.packages <- c("BiocManager", "devtools", "seqinr", "LncFinder", "ape", "tools", "ggtree") #list of packages required
+list.of.packages <- c("BiocManager", "devtools", "seqinr", "LncFinder", "ape", "tools", "ggtree", "phangorn") #list of packages required
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])] #list of packages non installed
 if(length(new.packages)) install.packages(new.packages, repos='https://cran.rstudio.com/') #install packages if the new.packages list is not empty
 #devtools::install_bioc("Biostrings")
@@ -51,6 +51,7 @@ library(msa)
 library(ape)
 library(tools)
 library(ggtree)
+library(phangorn)
 
 
 #set environment
@@ -76,9 +77,9 @@ Transcriptome_dir <- file.path(wdir, "Donnees/Transcriptomes/")
 Genes_dir <- file.path(wdir, "Genes_Biosynthesis/")
 
 ## Output directory
-ORFdir <- file.path(wdir, "R_Orf/")
-PhylogenyDir <- file.path(wdir, "Phylogeny/")
-Multiple_align_Dir <- file.path(wdir, "Multiple_Alignement/")
+ORFdir <- file.path(wdir, "R_Orf/GWauti/")
+PhylogenyDir <- file.path(wdir, "Phylogeny/GWauti/")
+Multiple_align_Dir <- file.path(wdir, "Multiple_Alignement/GWauti/")
 
 
 
@@ -86,18 +87,18 @@ Multiple_align_Dir <- file.path(wdir, "Multiple_Alignement/")
 # 01. CRÉATION DES BASES DE DONNÉES AVEC NOS TRANSCRIPTOMES 
 #-------------------------------------------------------------------
 
-transcriptome_f <- read.fasta(file.path(Transcriptome_dir, "highest_iso_GFBF_GHCZ01.1.fsa_nt"))
-transcriptome_m <- read.fasta(file.path(Transcriptome_dir, "highest_iso_GFBM_GHDA01.1.fsa_nt"))
+transcriptome_f <- read.fasta(file.path(Transcriptome_dir, "highest_iso_GWauti-f_GHCR01.1.fsa_nt"))
+transcriptome_m <- read.fasta(file.path(Transcriptome_dir, "highest_iso_GWauti-m_GHCN01.1.fsa_nt"))
 
-makeblastdb(file.path(Transcriptome_dir, "highest_iso_GFBF_GHCZ01.1.fsa_nt"), dbtype = "nucl", args = c("-out GfossB_f -title GfossB_f -parse_seqids"))
-makeblastdb(file.path(Transcriptome_dir, "highest_iso_GFBM_GHDA01.1.fsa_nt"), dbtype = "nucl", args=c("-out GfossB_m -title GfossB_m -parse_seqids"))
+makeblastdb(file.path(Transcriptome_dir, "highest_iso_GWauti-f_GHCR01.1.fsa_nt"), dbtype = "nucl", args = c("-out GWauti-f -title GWauti-f -parse_seqids"))
+makeblastdb(file.path(Transcriptome_dir, "highest_iso_GWauti-m_GHCN01.1.fsa_nt"), dbtype = "nucl", args=c("-out GWauti-m -title GWauti-m -parse_seqids"))
 
 #-------------------------------------------------------------------
 # 02. LOAD A BLAST DATABASE 
 #-------------------------------------------------------------------
 
-blast_f <- blast(db="GfossB_f", type= "tblastn")
-blast_m <- blast(db="GfossB_m", type= "tblastn")
+blast_f <- blast(db="GWauti-f", type= "tblastn")
+blast_m <- blast(db="GWauti-m", type= "tblastn")
 
 #-------------------------------------------------------------------
 # 03. AFFILIATION DES FICHIERS FASTA 
@@ -196,7 +197,7 @@ for ( i in 1:length(list_cyp) ){
 # 08. ALIGNEMENT MULTIPLE ET PHYLOGÉNIE 
 #-------------------------------------------------------------------
 
-list_orf <- list.files("R_Orf/")
+list_orf <- list.files(ORFdir)
 list_cyp_phylo <- c("CYP18_F_", "CYP18_M_","CYP302_F_","CYP302_M_", "CYP306_F_", "CYP306_M_","CYP307_F_", 
                     "CYP307_M_","CYP314_F_", "CYP314_M_","CYP315_F_","CYP315_M_")
 
@@ -207,17 +208,25 @@ top_cyp_blast = rbind(top_cyp_blast_f$CYP18$SubjectID,top_cyp_blast_m$CYP18$Subj
 
 
 for ( i in 1:length(list_orf)) {
-  sequence <- readAAStringSet(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path(ORFdir, list_orf[i])) )
-  multiple_alignement <- msa(sequence, method = "Muscle", type = "protein")
+  sequence <- readAAStringSet(c("Phylogeny/Phylogeny_Fasta_Arthropods.fasta",file.path("R_Orf/EchinoB/", list_orf[i]), 
+                              file.path("R_Orf/GFossB/", list_orf[i]), file.path("R_Orf/GPulex/", list_orf[i]),
+                              file.path("R_Orf/GWauti/", list_orf[i])))
+  multiple_alignement <- msa(sequence, method = "ClustalW", type = "protein")
   #msaPrettyPrint(multiple_alignement, file = file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep = "")) , output = "tex")
   #texi2pdf(file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep="")), clean = TRUE)
-  alignement <- msaConvert(multiple_alignement)
-  d <-  as.matrix(dist.alignment(alignement, matrix = "identity" ))
+  #alignement <- msaConvert(multiple_alignement)
+  alignement_phydat <- as.phyDat(multiple_alignement)
+  d <-  dist.ml(alignement_phydat, model = "JC69" )
   tree <- bionj(d)
   df <- data.frame(taxa = top_cyp_blast[i],orf = "orf")
   row.names(df) <- NULL
-  ggtree(tree) %<+% df + geom_tiplab(aes(color=orf), font=2) + xlim(0,1) + geom_treescale() + theme(legend.position = "none")
-  ggsave(file.path(PhylogenyDir, paste("phylo_tree_", list_cyp_phylo[i],"Rstudio.pdf", sep = "")), 
+  fit <- pml(tree, alignement_phydat)
+  #fit <- optim.pml(fit, rearrangement="NNI")
+  bs <- bootstrap.pml(fit, bs=100, optNni=TRUE )
+  treeBS <- plotBS(fit$tree,bs, type = "phylogram")
+  ggtree(treeBS) %<+% df + geom_tiplab(aes(color=orf), font=2) + xlim(0,5) + geom_treescale() + theme(legend.position = "none") +
+    geom_nodelab(aes(x=branch), vjust=-.5, size=3, color="red")
+  ggsave(file.path("Phylogeny/", paste("PhyML_all_", list_cyp_phylo[i],"Rstudio.pdf", sep = "")), 
          device = "pdf",height = 60, width = 35, units = "cm", limitsize = FALSE)
 }
 
@@ -232,31 +241,29 @@ for ( i in 1:length(list_orf)) {
 #Matrix products: default
 
 #locale:
-# LC_COLLATE=French_France.1252  LC_CTYPE=French_France.1252    LC_MONETARY=French_France.1252
-# LC_NUMERIC=C                   LC_TIME=French_France.1252    
+#LC_COLLATE=French_France.1252  LC_CTYPE=French_France.1252    LC_MONETARY=French_France.1252 LC_NUMERIC=C                  
+#LC_TIME=French_France.1252    
 
 #attached base packages:
-# tools     stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     
+#tools     stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
-# other attached packages:
-# ape_5.5             msa_1.22.0          LncFinder_1.1.4     seqinr_4.2-5        rBLAST_0.99.2      
+#other attached packages:
+# ggtree_2.4.2        ape_5.5             LncFinder_1.1.4     seqinr_4.2-5        rBLAST_0.99.2       msa_1.22.0         
 # Biostrings_2.58.0   XVector_0.30.0      IRanges_2.24.1      S4Vectors_0.28.1    BiocGenerics_0.36.1
 
-# loaded via a namespace (and not attached):
-# pkgload_1.2.1        splines_4.0.3        foreach_1.5.1        prodlim_2019.11.13   assertthat_0.2.1    
-# BiocManager_1.30.12  remotes_2.3.0        progress_1.2.2       sessioninfo_1.1.1    ipred_0.9-11        
-# pillar_1.6.0         lattice_0.20-44      glue_1.4.2           pROC_1.17.0.1        colorspace_2.0-0    
-# recipes_0.1.16       Matrix_1.2-18        plyr_1.8.6           timeDate_3043.102    pkgconfig_2.0.3     
-# devtools_2.4.0       caret_6.0-86         zlibbioc_1.36.0      purrr_0.3.4          scales_1.1.1        
-# processx_3.5.1       gower_0.2.2          lava_1.6.9           proxy_0.4-25         tibble_3.1.1        
-# generics_0.1.0       ggplot2_3.3.3        usethis_2.0.1        ellipsis_0.3.1       cachem_1.0.4        
-# withr_2.4.2          nnet_7.3-15          cli_2.5.0            survival_3.2-11      magrittr_2.0.1      
-# crayon_1.4.1         memoise_2.0.0        ps_1.6.0             fs_1.5.0             fansi_0.4.2         
-# nlme_3.1-152         MASS_7.3-53.1        class_7.3-18         pkgbuild_1.2.0       data.table_1.14.0   
-# prettyunits_1.1.1    hms_1.0.0            lifecycle_1.0.0      stringr_1.4.0        munsell_0.5.0       
-# callr_3.7.0          e1071_1.7-6          ade4_1.7-16          compiler_4.0.3       rlang_0.4.10        
-# grid_4.0.3           iterators_1.0.13     rstudioapi_0.13      testthat_3.0.2       ModelMetrics_1.2.2.2
-# gtable_0.3.0         codetools_0.2-18     DBI_1.1.1            curl_4.3             reshape2_1.4.4      
-# R6_2.5.0             lubridate_1.7.10     dplyr_1.0.5          fastmap_1.1.0        utf8_1.2.1          
-# rprojroot_2.0.2      desc_1.3.0           stringi_1.5.3        Rcpp_1.0.6           vctrs_0.3.8         
-# rpart_4.1-15         tidyselect_1.1.1   
+#loaded via a namespace (and not attached):
+# nlme_3.1-152         fs_1.5.0             usethis_2.0.1        lubridate_1.7.10     devtools_2.4.1       progress_1.2.2      
+# rprojroot_2.0.2      utf8_1.2.1           R6_2.5.0             rpart_4.1-15         lazyeval_0.2.2       DBI_1.1.1           
+# colorspace_2.0-1     ade4_1.7-16          nnet_7.3-16          withr_2.4.2          tidyselect_1.1.1     prettyunits_1.1.1   
+# processx_3.5.1       curl_4.3             compiler_4.0.3       cli_2.5.0            desc_1.3.0           scales_1.1.1        
+# callr_3.7.0          proxy_0.4-25         stringr_1.4.0        pkgconfig_2.0.3      sessioninfo_1.1.1    fastmap_1.1.0       
+# rlang_0.4.10         rstudioapi_0.13      generics_0.1.0       jsonlite_1.7.2       dplyr_1.0.5          ModelMetrics_1.2.2.2
+# magrittr_2.0.1       patchwork_1.1.1      Matrix_1.2-18        Rcpp_1.0.6           munsell_0.5.0        fansi_0.4.2         
+# lifecycle_1.0.0      stringi_1.5.3        pROC_1.17.0.1        MASS_7.3-54          zlibbioc_1.36.0      pkgbuild_1.2.0      
+# plyr_1.8.6           recipes_0.1.16       grid_4.0.3           crayon_1.4.1         lattice_0.20-44      splines_4.0.3       
+# hms_1.0.0            ps_1.6.0             pillar_1.6.0         reshape2_1.4.4       codetools_0.2-18     pkgload_1.2.1       
+# glue_1.4.2           data.table_1.14.0    remotes_2.3.0        BiocManager_1.30.15  treeio_1.14.4        vctrs_0.3.8         
+# foreach_1.5.1        testthat_3.0.2       tidyr_1.1.3          gtable_0.3.0         purrr_0.3.4          assertthat_0.2.1    
+# cachem_1.0.4         ggplot2_3.3.3        gower_0.2.2          prodlim_2019.11.13   tidytree_0.3.3       e1071_1.7-6         
+# class_7.3-19         survival_3.2-11      timeDate_3043.102    tibble_3.1.1         rvcheck_0.1.8        iterators_1.0.13    
+# aplot_0.0.6          memoise_2.0.0        lava_1.6.9           ellipsis_0.3.1       caret_6.0-86         ipred_0.9-11        
