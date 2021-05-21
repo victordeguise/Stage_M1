@@ -3,15 +3,16 @@
 # 12/05/2021
 
 # To execute the script : ./Nettoyage_Transcriptome.bash assemblie_file R1 R2
-# Don't forget R1/R2 not already create
-# Refer to line 48 to know ther names. 
+# just name of the assemblie file, not the path. 
+# Don't forget R1/R2 not already create.
+# Refer to line 48 to know their names, with the path here ! 
 
 # DIRECTORIES
 
-MYDIR=/mnt/c/Users/Victor/Desktop/Cours/Master/S2/Stage/Nettoyage_Transcriptomes
-ASSEMBLIES_DIR=/mnt/c/Users/Victor/Desktop/Cours/Master/S2/Stage/Nettoyage_Transcriptomes/RNA-Seq_Proteogam_assemblies
-FASTQ_DIR=/mnt/c/Users/Victor/Desktop/Cours/Master/S2/Stage/Nettoyage_Transcriptomes/RNA-Seq_Proteogam_Fastq
+MYDIR=~/Stage/
 TRINITY=~/Stage/trinityrnaseq-v2.12.0/util
+ASSEMBLIES_DIR=~/Stage/Nettoyage_Transcriptomes/RNA-Seq_Proteogam_assemblies/
+FASTQ_DIR=~/Stage/Nettoyage_Transcriptomes/RNA-Seq_Proteogam_Fastq/
 RESULTS=~/Stage/Results
 
 # INITIALIZATION
@@ -48,7 +49,7 @@ for i in $(ls $FASTQ_DIR); do
 				# Le fichier prendra les 4 premiers caractères du fastq lu, le R1 ou R2 puis .fastq
 			fi
 	done
-	#rm $FASTQ_DIR/${i} # suppression du Fastq compressé
+	rm $FASTQ_DIR/${i} # suppression du Fastq compressé
 done
 
 
@@ -61,7 +62,7 @@ R2=$3
 # Abundance estimation 
 
 $TRINITY/align_and_estimate_abundance.pl \
---transcripts ${my_transcript} --seqType fq \
+--transcripts $ASSEMBLIES_DIR/${my_transcript} --seqType fq \
 --left ${R1} --right ${R2} --SS_lib_type RF --est_method RSEM \
 --aln_method bowtie --prep_reference --output_dir rsem_outdir/${my_transcript::8} --trinity_mode \
 --thread_count 20		# On fait ${my_transcript::X} pour prendre que les X 1er caractères
@@ -79,7 +80,7 @@ echo "### Second step end "
 
 $TRINITY/filter_low_expr_transcripts.pl \
 --matrix $MYDIR/RSEM.isoform.TPM.not_cross_norm \
---transcripts ${my_transcript} \
+--transcripts $ASSEMBLIES_DIR/${my_transcript} \
 --highest_iso_only --trinity_mode >$RESULTS/highest_iso_${my_transcript}
 
 echo "### Finish !!"
@@ -88,4 +89,3 @@ echo "### Finish !!"
 
 rm $MYDIR/RSEM.*
 rm $ASSEMBLIES_DIR/${my_transcript}.*
-rm -r $MYDIR/rsem_outdir/*
