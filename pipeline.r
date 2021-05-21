@@ -214,14 +214,13 @@ for ( i in 1:length(list_orf)) {
   multiple_alignement <- msa(sequence, method = "ClustalW", type = "protein")
   #msaPrettyPrint(multiple_alignement, file = file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep = "")) , output = "tex")
   #texi2pdf(file.path(Multiple_align_Dir, paste(list_orf[i], ".tex", sep="")), clean = TRUE)
-  #alignement <- msaConvert(multiple_alignement)
   alignement_phydat <- as.phyDat(multiple_alignement)
   d <-  dist.ml(alignement_phydat, model = "JC69" )
   tree <- bionj(d)
   df <- data.frame(taxa = top_cyp_blast[i],orf = "orf")
   row.names(df) <- NULL
   fit <- pml(tree, alignement_phydat)
-  #fit <- optim.pml(fit, rearrangement="NNI")
+  fit <- optim.pml(fit, rearrangement="NNI")
   bs <- bootstrap.pml(fit, bs=100, optNni=TRUE )
   treeBS <- plotBS(fit$tree,bs, type = "phylogram")
   ggtree(treeBS) %<+% df + geom_tiplab(aes(color=orf), font=2) + xlim(0,5) + geom_treescale() + theme(legend.position = "none") +
@@ -248,22 +247,19 @@ for ( i in 1:length(list_orf)) {
 #tools     stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 #other attached packages:
-# ggtree_2.4.2        ape_5.5             LncFinder_1.1.4     seqinr_4.2-5        rBLAST_0.99.2       msa_1.22.0         
+# phangorn_2.7.0      ggtree_2.99.0       ape_5.5             LncFinder_1.1.4     seqinr_4.2-5        rBLAST_0.99.2       msa_1.22.0         
 # Biostrings_2.58.0   XVector_0.30.0      IRanges_2.24.1      S4Vectors_0.28.1    BiocGenerics_0.36.1
 
 #loaded via a namespace (and not attached):
-# nlme_3.1-152         fs_1.5.0             usethis_2.0.1        lubridate_1.7.10     devtools_2.4.1       progress_1.2.2      
-# rprojroot_2.0.2      utf8_1.2.1           R6_2.5.0             rpart_4.1-15         lazyeval_0.2.2       DBI_1.1.1           
-# colorspace_2.0-1     ade4_1.7-16          nnet_7.3-16          withr_2.4.2          tidyselect_1.1.1     prettyunits_1.1.1   
-# processx_3.5.1       curl_4.3             compiler_4.0.3       cli_2.5.0            desc_1.3.0           scales_1.1.1        
-# callr_3.7.0          proxy_0.4-25         stringr_1.4.0        pkgconfig_2.0.3      sessioninfo_1.1.1    fastmap_1.1.0       
-# rlang_0.4.10         rstudioapi_0.13      generics_0.1.0       jsonlite_1.7.2       dplyr_1.0.5          ModelMetrics_1.2.2.2
-# magrittr_2.0.1       patchwork_1.1.1      Matrix_1.2-18        Rcpp_1.0.6           munsell_0.5.0        fansi_0.4.2         
-# lifecycle_1.0.0      stringi_1.5.3        pROC_1.17.0.1        MASS_7.3-54          zlibbioc_1.36.0      pkgbuild_1.2.0      
-# plyr_1.8.6           recipes_0.1.16       grid_4.0.3           crayon_1.4.1         lattice_0.20-44      splines_4.0.3       
-# hms_1.0.0            ps_1.6.0             pillar_1.6.0         reshape2_1.4.4       codetools_0.2-18     pkgload_1.2.1       
-# glue_1.4.2           data.table_1.14.0    remotes_2.3.0        BiocManager_1.30.15  treeio_1.14.4        vctrs_0.3.8         
-# foreach_1.5.1        testthat_3.0.2       tidyr_1.1.3          gtable_0.3.0         purrr_0.3.4          assertthat_0.2.1    
-# cachem_1.0.4         ggplot2_3.3.3        gower_0.2.2          prodlim_2019.11.13   tidytree_0.3.3       e1071_1.7-6         
-# class_7.3-19         survival_3.2-11      timeDate_3043.102    tibble_3.1.1         rvcheck_0.1.8        iterators_1.0.13    
-# aplot_0.0.6          memoise_2.0.0        lava_1.6.9           ellipsis_0.3.1       caret_6.0-86         ipred_0.9-11        
+# tidyr_1.1.3          jsonlite_1.7.2       splines_4.0.3        foreach_1.5.1        prodlim_2019.11.13   assertthat_0.2.1     BiocManager_1.30.15 
+# rvcheck_0.1.8        progress_1.2.2       ipred_0.9-11         pillar_1.6.0         lattice_0.20-44      quadprog_1.5-8       glue_1.4.2          
+# digest_0.6.27        pROC_1.17.0.1        colorspace_2.0-1     recipes_0.1.16       Matrix_1.2-18        plyr_1.8.6           timeDate_3043.102   
+# pkgconfig_2.0.3      caret_6.0-86         zlibbioc_1.36.0      purrr_0.3.4          patchwork_1.1.1      tidytree_0.3.3       scales_1.1.1        
+# gower_0.2.2          lava_1.6.9           tibble_3.1.1         proxy_0.4-25         farver_2.1.0         generics_0.1.0       ggplot2_3.3.3       
+# ellipsis_0.3.1       withr_2.4.2          nnet_7.3-16          lazyeval_0.2.2       survival_3.2-11      magrittr_2.0.1       crayon_1.4.1        
+# fansi_0.4.2          nlme_3.1-152         MASS_7.3-54          class_7.3-19         data.table_1.14.0    prettyunits_1.1.1    hms_1.0.0           
+# lifecycle_1.0.0      stringr_1.4.0        aplot_0.0.6          munsell_0.5.0        ade4_1.7-16          compiler_4.0.3       e1071_1.7-6         
+# rlang_0.4.10         grid_4.0.3           iterators_1.0.13     rstudioapi_0.13      igraph_1.2.6         labeling_0.4.2       gtable_0.3.0        
+# ModelMetrics_1.2.2.2 codetools_0.2-18     DBI_1.1.1            reshape2_1.4.4       R6_2.5.0             lubridate_1.7.10     dplyr_1.0.6         
+# utf8_1.2.1           fastmatch_1.1-0      treeio_1.15.7        stringi_1.5.3        Rcpp_1.0.6           vctrs_0.3.8          rpart_4.1-15        
+# tidyselect_1.1.1
